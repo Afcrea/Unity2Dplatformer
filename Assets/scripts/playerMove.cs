@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayMove : MonoBehaviour
@@ -81,7 +82,12 @@ public class PlayMove : MonoBehaviour
     {
         if(collision.gameObject.tag == "Enemy")
         {
-            OnDamaged(collision.transform.position);
+            if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
+                OnAttack();
+            }
+            else
+                OnDamaged(collision.transform.position);
         }
     }
 
@@ -107,5 +113,14 @@ public class PlayMove : MonoBehaviour
         gameObject.layer = 6;
 
         spriteRenderer.color = new Color(1, 1, 1, 1);
+    }
+    
+    private void OnAttack()
+    {
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+
+        enemyMove enemy = GetComponent<enemyMove>();
+
+        enemy.OnDamaged();
     }
 }
