@@ -9,14 +9,14 @@ public class enemyMove : MonoBehaviour
     public int nextMove;
     Animator anime;
     SpriteRenderer spriteRenderer;
-    Collider enemyCollider;
+    CircleCollider2D enemyCollider;
     // Start is called before the first frame update
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         anime = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        enemyCollider = GetComponent<Collider>();
+        enemyCollider = GetComponent<CircleCollider2D>();
 
         Invoke("Think", 5);
     }
