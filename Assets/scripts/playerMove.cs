@@ -8,10 +8,20 @@ public class PlayMove : MonoBehaviour
     public GameManager gameManager;
     public float maxSpeed;
     public float jumpPower;
+
+    public AudioClip audioJump;
+    public AudioClip audioAttack;
+    public AudioClip audioDamaged;
+    public AudioClip audioItem;
+    public AudioClip audioDie;
+    public AudioClip audioFinish;
+
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator animetor;
     CapsuleCollider2D col;
+
+    AudioSource audiosource;
     // Start is called before the first frame update
     void Awake()
     {
@@ -19,6 +29,39 @@ public class PlayMove : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animetor = GetComponent<Animator>();
         col = GetComponent<CapsuleCollider2D>();
+        audiosource = GetComponent<AudioSource>();
+    }
+
+    void PlaySound(string action)
+    {
+        switch(action)
+        {
+            case "JUMP":
+                audiosource.clip = audioJump;
+                break;
+
+            case "ATTACK":
+                audiosource.clip = audioAttack;
+                break;
+
+            case "DAMAGED":
+                audiosource.clip = audioDamaged;
+                break;
+
+            case "ITEM":
+                audiosource.clip = audioItem;
+                break;
+
+            case "DIE":
+                audiosource.clip = audioDie;
+                break;
+
+            case "FINISH":
+                audiosource.clip = audioFinish;
+                break;
+        }
+
+        audiosource.Play();
     }
 
     private void Update()
@@ -29,6 +72,7 @@ public class PlayMove : MonoBehaviour
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
 
             animetor.SetBool("isJumping", true);
+            PlaySound("JUMP");
         }
 
             // Stop Speed
@@ -98,6 +142,7 @@ public class PlayMove : MonoBehaviour
     {
         if(collision.gameObject.tag == "Item")
         {
+            PlaySound("ITEM");
             bool isBronze = collision.gameObject.name.Contains("Bronze");
             bool isSilver = collision.gameObject.name.Contains("Silver");
             bool isGold = collision.gameObject.name.Contains("Gold");
@@ -122,6 +167,7 @@ public class PlayMove : MonoBehaviour
 
         if (collision.gameObject.tag == "Flag")
         {
+            PlaySound("FINISH");
             gameManager.NextStage();
         }
     }
@@ -140,8 +186,10 @@ public class PlayMove : MonoBehaviour
         rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
         animetor.SetTrigger("Damaged");
 
+
+        PlaySound("DAMAGED");
         //피 깎임
-        
+
         Invoke("OffDamaged", 1);
     }
 
@@ -154,6 +202,8 @@ public class PlayMove : MonoBehaviour
     
     void OnAttack(Transform enemy)
     {
+        PlaySound("ATTACK");
+
         gameManager.stagePoint += 100;
 
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
@@ -171,10 +221,13 @@ public class PlayMove : MonoBehaviour
 
         col.enabled = false;
 
-        // 재시작 로직
-
-        Debug.Log("die");
+        PlaySound("DIE");
 
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+    }
+
+    public void VelocityZero()
+    {
+        rigid.velocity = Vector3.zero;
     }
 }
